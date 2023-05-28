@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+
+    <title>数字あてゲーム</title>
+
+    <style>
+      html {
+        font-family: sans-serif;
+      }
+
+      body {
+        width: 50%;
+        max-width: 800px;
+        min-width: 480px;
+        margin: 0 auto;
+      }
+      
+      .form input[type="number"] {
+        width: 200px;
+      }
+
+      .lastResult {
+        color: white;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>数字あてゲーム</h1>
+
+    <p>1 から 100 までの数字を当ててみて！10 回以内に当てられるでしょうか。選んだ数字が大きいか小さいかを表示します。</p>
+
+    <!-- 予想入力コンテナ -->
+    <div class="form">
+      <label for="guessField">予想を入力してください: </label>
+      <input type="number" min="1" max="100" required id="guessField" class="guessField">
+      <input type="submit" value="予想する" class="guessSubmit">
+    </div>
+
+    <!-- 結果表示コンテナ -->
+    <div class="resultParas">
+      <p class="guesses"></p>
+      <p class="lastResult"></p>
+      <p class="lowOrHi"></p>
+    </div>
+
+    <script>
+
+        // 1から100までランダムな数値を生成
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+    
+        /* 各変数を初期化
+         * guesses:予想回数, lastResult:直前の予想結果, lowOrHi:選んだ数字が大きいor小さい,
+         * guessSubmit:予想送信, guessField:予想入力欄, guessCount:予想回数を追跡, resetButton:リセットボタン */
+    
+        const guesses = document.querySelector('.guesses');
+        const lastResult = document.querySelector('.lastResult');
+        const lowOrHi = document.querySelector('.lowOrHi');
+        const guessSubmit = document.querySelector('.guessSubmit');
+        const guessField = document.querySelector('.guessField');
+    
+        let guessCount = 1;
+        let resetButton;
+    
+        // 予想
+        function checkGuess() {
+            //予想した数字
+            let userGuess = Number(guessField.value); 
+            if (guessCount === 1) {
+                guesses.textContent = '前回の予想: ';
+            } 
+    
+            guesses.textContent += userGuess + ' '; 
+    
+            //予想が一致したとき
+            if (userGuess === randomNumber) { 
+                lastResult.textContent = '正解!';
+                lastResult.style.backgroundColor = 'green';
+                lowOrHi.textContent = '';
+                setGameOver(); 
+    
+            //予想回数が10回いった
+            } else if (guessCount === 10) { 
+                lastResult.textContent = 'Gameover...';
+                lowOrHi.textContent = '';
+                setGameOver(); 
+    
+            //それ以外
+            } else { 
+                lastResult.textContent = '不正解..';
+                lastResult.style.backgroundColor = 'red';
+                if (userGuess < randomNumber ) {
+                    lowOrHi.textContent = '今の予想は正解より小さいです';
+                } else if (userGuess > randomNumber ) {
+                    lowOrHi.textContent = '今の予想は正解より大きいです';
+                }
+            }
+    
+            guessCount++; //予想回数追加
+            guessField.value = ''; //予想入力欄クリア
+            guessField.focus();
+        }
+    
+        guessSubmit.addEventListener('click', checkGuess);
+    
+        //ゲームオーバー
+        function setGameOver() {
+            guessField.disabled = true;
+            guessSubmit.disabled = true;
+            resetButton = document.createElement('button');
+            resetButton.textContent = '新しいゲームを始める';
+            document.body.appendChild(resetButton);
+            resetButton.addEventListener('click', resetGame);
+        }
+    
+        //ゲームリセット
+        function resetGame() {
+            guessCount = 1;
+    
+            const resetParas = document.querySelectorAll('.resultParas p');
+            for (const resetPara of resetParas) {
+                resetPara.textContent = '';
+            }
+    
+            resetButton.parentNode.removeChild(resetButton);
+    
+            guessField.disabled = false;
+            guessSubmit.disabled = false;
+            guessField.value = '';
+            guessField.focus();
+            lastResult.style.backgroundColor = 'white';
+            randomNumber = Math.floor(Math.random() * 100 ) + 1 ;
+        }
+        </script>
+        
+  </body>
+</html>
